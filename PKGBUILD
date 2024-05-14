@@ -17,16 +17,25 @@
 _extractedName="google-cloud-sdk"
 pkgname="google-cloud-cli"
 pkgver=475.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A set of command-line tools for the Google Cloud Platform. Includes gcloud (with beta and alpha commands), gsutil, and bq."
 url="https://cloud.google.com/cli/"
 license=('Apache-2.0')
 arch=('x86_64')
 depends=('python')
+
 optdepends=(
   "python-crcmod: [gsutil] verify the integrity of GCS object contents"
 )
 options=('!strip' 'staticlibs' !zipman)
+
+_use_pyupgrade=0
+
+if [ $_use_pyupgrade -eq 1 ]; then
+  makedepends=('pyupgrade')
+fi
+
+
 # TODO:
 #  - cleanup of package content
 #  - maybe use .deb as source? (already compressed manpages)
@@ -42,7 +51,7 @@ conflicts=('google-cloud-sdk')
 provides=('google-cloud-sdk')
 replaces=('google-cloud-sdk')
 sha256sums=('2e73368a34cecdba948bc615fd894bf25fc80cf3ef36cdf0709a5e912d581adb'
-            'e03ffb8a534b175dc497621a0396bcc29884279daa519e2cb90bd98c61d6530a'
+            '5d9ca924675b24fc1ed044cf52f9f218e72ddc12703770271b0417a4a3c3a15d'
             'c19dbe916e6fd18d9b17b3309ee60c5d389035c5520822d2c14c045d8b853924')
 
 prepare() {
@@ -58,6 +67,11 @@ prepare() {
       ) \
     )
   done
+
+  if [ $_use_pyupgrade -eq 1 ]; then
+    echo "Running pyupgrade, it will take some time..."
+    find . -name "*.py" -type f -exec pyupgrade {} + >/dev/null
+  fi
 }
 
 package() {
