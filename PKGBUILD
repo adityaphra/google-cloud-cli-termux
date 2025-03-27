@@ -29,12 +29,6 @@ optdepends=(
 )
 options=('!strip' 'staticlibs' !zipman)
 
-_use_pyupgrade=0
-
-if [ $_use_pyupgrade -eq 1 ]; then
-  makedepends=('pyupgrade')
-fi
-
 
 # TODO:
 #  - cleanup of package content
@@ -67,11 +61,6 @@ prepare() {
       ) \
     )
   done
-
-  if [ $_use_pyupgrade -eq 1 ]; then
-    echo "Running pyupgrade, it will take some time..."
-    find . -name "*.py" -type f -exec pyupgrade {} + >/dev/null
-  fi
 }
 
 package() {
