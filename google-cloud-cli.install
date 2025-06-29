@@ -12,10 +12,12 @@ BLUE="${BOLD}$(tput setaf 4)"
 YELLOW="${BOLD}$(tput setaf 3)"
 
 post_install() {
-    msg_blue "Binaries are now linked to /usr/bin/, no need to adjust PATH anymore"
+    msg_blue "Binaries are now linked to /usr/bin, no need to adjust PATH anymore"
 
-    note "Bundled Python was removed from the package as python >=3.13 is now supported."
-    echo "     If you experience any issues due this change, please comment on AUR with your current environment variables."
+    msg_blue "Bundled Python was removed from the package as python >=3.13 is now supported."
+    
+    note "Package was split into 3 packages:"
+    echo "    google-cloud-cli, google-cloud-cli-bq, google-cloud-cli-gsutil"
 }
 
 post_upgrade() {
