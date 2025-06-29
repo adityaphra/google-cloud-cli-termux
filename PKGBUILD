@@ -9,6 +9,7 @@
 # Contributor: tobbik
 
 #  shellcheck disable=SC2034
+#  shellcheck disable=SC2164,SC2154
 
 # Release Notes: https://cloud.google.com/sdk/docs/release-notes
 # Cloud Storage Bucket: https://console.cloud.google.com/storage/browser/cloud-sdk-release/for_packagers/linux
@@ -19,7 +20,7 @@
 _extractedName="google-cloud-sdk"
 pkgname="google-cloud-cli"
 pkgver=528.0.0
-pkgrel=1
+pkgrel=5
 pkgdesc="A set of command-line tools for the Google Cloud Platform. Includes gcloud (with beta and alpha commands), gsutil, and bq."
 url="https://cloud.google.com/cli/"
 license=('Apache-2.0')
@@ -31,8 +32,8 @@ optdepends=(
 )
 options=('!strip' 'staticlibs' '!zipman' '!debug' '!lto')
 
-# Python 3.13 is not officialy supported yet, force use of bundled 3.12
-export _force_budled_python=true
+export _force_budled_python=false
+export _package_bundled_python=false
 
 # TODO:
 #  - packages for components
@@ -41,8 +42,8 @@ source=(
   "$pkgname.install"
   "0003-add-compdef-to-zsh-completion.patch"
 )
-source_x86_64=($pkgname-$pkgver.orig_x86_64.tar.gz::https://dl.google.com/dl/cloudsdk/release/downloads/for_packagers/linux/${pkgname}_${pkgver}.orig_amd64.tar.gz)
-source_aarch64=($pkgname-$pkgver.orig_aarch64.tar.gz::https://dl.google.com/dl/cloudsdk/release/downloads/for_packagers/linux/${pkgname}_${pkgver}.orig_aarch64.tar.gz)
+source_x86_64=("$pkgname-$pkgver.orig_x86_64.tar.gz::https://dl.google.com/dl/cloudsdk/release/downloads/for_packagers/linux/${pkgname}_${pkgver}.orig_amd64.tar.gz")
+source_aarch64=("$pkgname-$pkgver.orig_aarch64.tar.gz::https://dl.google.com/dl/cloudsdk/release/downloads/for_packagers/linux/${pkgname}_${pkgver}.orig_aarch64.tar.gz")
 
 install=$pkgname.install
 
@@ -52,7 +53,7 @@ provides=('google-cloud-sdk')
 replaces=('google-cloud-sdk')
 
 sha256sums=('6e88b535c020b0f28c986fdb66918f8c07e4d337e813b77ec2068068f03457f8'
-            'fdba342aecce102b85fd96f21205d7ee2f8043b4bb56cabf363375785e3d423c'
+            'd8540ddc2956453a78016e7a15dc737d8c6ce37aba44ab8290ea91d3f73c667a'
             'c19dbe916e6fd18d9b17b3309ee60c5d389035c5520822d2c14c045d8b853924')
 sha256sums_x86_64=('0eb967e6d906af8aee517561104899de81520a54d37421c715e94b13a176d3dc')
 sha256sums_aarch64=('23d31bc8d0723fc9564b42e5a233dafa2462cca3c21a23834c541a58f2835e04')
@@ -71,6 +72,11 @@ prepare() {
       ) \
     )
   done
+
+  if [ "$_package_bundled_python" = false ]; then
+    rm -rf platform/bundledpythonunix
+    rm -f .install/bundled-python3-unix*
+  fi
 }
 
 package() {
@@ -78,21 +84,12 @@ package() {
   _bundled_py_bin="${_install_path:${#pkgdir}}/platform/bundledpythonunix/bin/python3"
 
   mkdir "${pkgdir}/opt"
-  cp -r "${_extractedName}" "${_install_path}"
-
-  # The Google code uses a _TraceAction() method which spams the screen even
-  # in "quiet" mode, we're throwing away output on purpose to keep it clean
-  #  ref: lib/googlecloudsdk/core/platforms_install.py
-  "${_install_path}/install.sh" \
-    --quiet \
-    --usage-reporting false \
-    --path-update false \
-    --bash-completion false \
-    > /dev/null 2>&1
 
   find $pkgdir -name '__pycache__' -type d -exec rm -rf {} +
 
-  install -D -m 0755 "${srcdir}/${source[0]}" \
+  install -d -m 0755 "${_extractedName}" "${_install_path}"
+
+  install -D -m 0644 "${srcdir}/${source[0]}" \
     "${pkgdir}/etc/profile.d/google-cloud-cli.sh"
 
   if [ "$_force_budled_python" = true ]; then
