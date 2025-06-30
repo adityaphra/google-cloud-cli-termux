@@ -1,12 +1,13 @@
 pkgbase = google-cloud-cli
 	pkgdesc = A core set of command-line tools for the Google Cloud Platform. Includes only gcloud core (with beta and alpha commands), gcloud-crc32c and man pages
 	pkgver = 528.0.0
-	pkgrel = 2
+	pkgrel = 3
 	url = https://cloud.google.com/cli/
 	arch = x86_64
 	arch = aarch64
 	license = Apache-2.0
-	depends = python
+	makedepends = jq
+	depends = python>=3.9
 	options = !strip
 	options = staticlibs
 	options = !zipman
@@ -38,7 +39,7 @@ pkgname = google-cloud-cli-bq
 
 pkgname = google-cloud-cli-gsutil
 	pkgdesc = Cloud Storage Command Line Tool: gsutil is not the recommended CLI for Cloud Storage
-	depends = python
+	depends = python>=3.9
 	depends = google-cloud-cli-bundled-python3-unix
 	optdepends = python-crcmod: verify the integrity of GCS object contents
 	provides = google-cloud-cli-gsutil

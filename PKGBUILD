@@ -65,13 +65,13 @@ pkgname=(
 #   'google-cloud-cli-component-gsutil'
 # )
 pkgver=528.0.0
-pkgrel=2
+pkgrel=3
 pkgdesc="A core set of command-line tools for the Google Cloud Platform. Includes only gcloud core (with beta and alpha commands), gcloud-crc32c and man pages"
 url="https://cloud.google.com/cli/"
 license=('Apache-2.0')
 arch=('x86_64' 'aarch64')
-depends=('python')
-
+depends=('python>=3.9')
+makedepends=('jq')
 options=('!strip' 'staticlibs' '!zipman' '!debug' '!lto')
 
 export _force_budled_python=false
